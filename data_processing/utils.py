@@ -96,6 +96,9 @@ def generate_interior_camera_positions(mesh, num_views):
         z = min_z + (max_z - min_z) * point[2]
         positions.append((x, y, z))
     
+    # Sort positions to minimize the differences between consecutive points
+    positions.sort(key=lambda pos: (pos[0], pos[1], pos[2]))
+    
     return positions
 
 
@@ -111,6 +114,10 @@ def generate_camera_positions(num_views, radius):
         y = r * np.sin(phi) * np.sin(theta)
         z = r * np.cos(phi)
         positions.append((x, y, z))
+    
+    # Sort positions to minimize the differences between consecutive points
+    positions.sort(key=lambda pos: (pos[0], pos[1], pos[2]))
+    
     return positions
 
 
