@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import os
 import json
-import ghalton
+
 
 def load_model(file_path):
     try:
@@ -26,7 +26,46 @@ def merge_geometries(scene):
             return None
     else:
         return scene
+    
+def rotation_matrix(axis, angle):
+    """
+    Create a rotation matrix given an axis and angle.
+    :param axis: The axis of rotation (a 3-element array).
+    :param angle: The angle of rotation in radians.
+    :return: A 3x3 rotation matrix.
+    """
+    axis = axis / np.linalg.norm(axis)
+    a = np.cos(angle / 2.0)
+    b, c, d = -axis * np.sin(angle / 2.0)
+    aa, bb, cc, dd = a * a, b * b, c * c, d * d
+    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
+def rotation_matrix_4x4(axis, angle):
+    """
+    Create a 4x4 transformation matrix given an axis and angle.
+    :param axis: The axis of rotation (a 3-element array).
+    :param angle: The angle of rotation in radians.
+    :return: A 4x4 transformation matrix.
+    """
+    rot_3x3 = rotation_matrix(axis, angle)
+    rot_4x4 = np.eye(4)
+    rot_4x4[:3, :3] = rot_3x3
+    return rot_4x4
+
+def apply_rotation(mesh, axis, angle):
+    """
+    Apply rotation to the mesh vertices.
+    :param mesh: The input mesh.
+    :param axis: The axis of rotation (a 3-element array).
+    :param angle: The angle of rotation in radians.
+    :return: The rotated mesh.
+    """
+    rot_matrix = rotation_matrix_4x4(axis, angle)
+    mesh.apply_transform(rot_matrix)
+    return mesh
 
 def convert_to_pyvista(mesh):
     try:
@@ -74,59 +113,21 @@ def generate_camera_intrinsics(fx, fy, cx, cy):
                      [0, 0, 1]])
 
 
-def generate_interior_camera_positions(mesh, num_views):
-    # Calculate the bounding box of the mesh
-    bounds = mesh.bounds
-    print(f"Mesh bounds: {bounds}")
-    
-    # Ensure the bounds array has the expected size
-    if bounds.shape != (2, 3):
-        raise ValueError("Bounds array does not have the expected size of 2x3 elements.")
-    
-    min_x, min_y, min_z = bounds[0]
-    max_x, max_y, max_z = bounds[1]
-
-    # Generate positions within the bounding box using the Halton sequence
-    sequencer = ghalton.Halton(3)
-    halton_seq = sequencer.get(num_views)
-    positions = []
-    for point in halton_seq:
-        x = min_x + (max_x - min_x) * point[0]
-        y = min_y + (max_y - min_y) * point[1]
-        z = min_z + (max_z - min_z) * point[2]
-        positions.append((x, y, z))
-    
-    # Sort positions to minimize the differences between consecutive points
-    positions.sort(key=lambda pos: (pos[0], pos[1], pos[2]))
-    
-    return positions
-
-
 def generate_camera_positions(num_views, radius):
-    sequencer = ghalton.Halton(3)
-    halton_seq = sequencer.get(num_views)
     positions = []
-    for point in halton_seq:
-        phi = np.pi * point[0]
-        theta = 2 * np.pi * point[1]
-        r = radius * point[2]
-        x = r * np.sin(phi) * np.cos(theta)
-        y = r * np.sin(phi) * np.sin(theta)
-        z = r * np.cos(phi)
+    for i in range(num_views):
+        phi = np.arccos(1 - 2 * (i / num_views))
+        theta = np.pi * (1 + 5 ** 0.5) * i
+        x = radius * np.sin(phi) * np.cos(theta)
+        y = radius * np.sin(phi) * np.sin(theta)
+        z = radius * np.cos(phi)
         positions.append((x, y, z))
-    
-    # Sort positions to minimize the differences between consecutive points
-    positions.sort(key=lambda pos: (pos[0], pos[1], pos[2]))
-    
     return positions
 
-
-def render_images(pv_mesh, texture, camera_positions, intrinsics, output_dir, show_scalar_bar=False):
+def render_images(pv_mesh, texture, camera_positions, intrinsics, output_dir):
     plotter = pv.Plotter(off_screen=True)
-    plotter.add_mesh(pv_mesh, texture=texture, show_scalar_bar=show_scalar_bar)
-    
-    # Adding internal lighting
-    plotter.add_light(pv.Light(position=(0, 0, 2), focal_point=(0, 0, 0), color='white', intensity=1.0))
+    plotter.add_mesh(pv_mesh, texture=texture, show_scalar_bar=False)
+    plotter.add_light(pv.Light(position=(5, 5, 5), focal_point=(0, 0, 0), color='white'))
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -176,3 +177,69 @@ def render_images(pv_mesh, texture, camera_positions, intrinsics, output_dir, sh
 def save_camera_data(camera_data, output_path):
     with open(output_path, 'w') as f:
         json.dump(camera_data, f, indent=4)
+
+
+def generate_camera_positions_along_wall(num_views, radius, height, wall_distance):
+    positions = []
+    focal_points = []
+    num_angles = 36
+    num_height = int(num_views / num_angles)
+    
+    for i in range(num_height):
+        z = height * (i / num_height)
+        for j in range(num_angles):
+            theta = j * 2 * np.pi / num_angles
+            x = wall_distance * np.cos(theta)
+            y = wall_distance * np.sin(theta)
+            positions.append((x, y, z))
+            focal_points.append((0, 0, z))  # Point towards the center or a specific height
+
+    return positions, focal_points
+
+def render_images_bg(pv_mesh, texture, camera_positions, focal_points, intrinsics, output_dir):
+    plotter = pv.Plotter(off_screen=True)
+    plotter.add_mesh(pv_mesh, texture=texture, show_scalar_bar=False)
+    plotter.add_light(pv.Light(position=(5, 5, 5), focal_point=(0, 0, 0), color='white'))
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    camera_data = []
+
+    for i, (position, focal_point) in enumerate(zip(camera_positions, focal_points)):
+        try:
+            view_up = [0, 0, 1]  # Up direction
+
+            print(f"Rendering image {i}:")
+            print(f"Position: {position}")
+            print(f"Focal Point: {focal_point}")
+            print(f"View Up: {view_up}")
+
+            plotter.camera_position = [position, focal_point, view_up]
+            plotter.camera.zoom(1)
+            plotter.render()
+
+            screenshot = plotter.screenshot(transparent_background=False)
+
+            img_name = f'image_{i:05d}.png'
+            cv2.imwrite(os.path.join(output_dir, img_name), cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))
+
+            camera_matrix = plotter.camera.GetModelViewTransformMatrix()
+            rotation_matrix = [[camera_matrix.GetElement(j, k) for k in range(3)] for j in range(3)]
+
+            camera_data.append({
+                "id": i,
+                "img_name": img_name,
+                "width": screenshot.shape[1],
+                "height": screenshot.shape[0],
+                "position": list(position),
+                "rotation": rotation_matrix,
+                "fy": int(intrinsics[1, 1]),
+                "fx": int(intrinsics[0, 0])
+            })
+
+        except Exception as e:
+            print(f"Error rendering image {i}: {e}")
+            break
+
+    plotter.close()
+    return camera_data
