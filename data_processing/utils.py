@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import os
 import json
-
+import ghalton
 
 def load_model(file_path):
     try:
@@ -85,25 +85,31 @@ def generate_interior_camera_positions(mesh, num_views):
     
     min_x, min_y, min_z = bounds[0]
     max_x, max_y, max_z = bounds[1]
-    
-    # Generate positions within the bounding box
+
+    # Generate positions within the bounding box using the Halton sequence
+    sequencer = ghalton.Halton(3)
+    halton_seq = sequencer.get(num_views)
     positions = []
-    for _ in range(num_views):
-        x = np.random.uniform(min_x, max_x)
-        y = np.random.uniform(min_y, max_y)
-        z = np.random.uniform(min_z, max_z)
+    for point in halton_seq:
+        x = min_x + (max_x - min_x) * point[0]
+        y = min_y + (max_y - min_y) * point[1]
+        z = min_z + (max_z - min_z) * point[2]
         positions.append((x, y, z))
     
     return positions
 
+
 def generate_camera_positions(num_views, radius):
+    sequencer = ghalton.Halton(3)
+    halton_seq = sequencer.get(num_views)
     positions = []
-    for i in range(num_views):
-        phi = np.arccos(1 - 2 * (i / num_views))
-        theta = np.pi * (1 + 5 ** 0.5) * i
-        x = radius * np.sin(phi) * np.cos(theta)
-        y = radius * np.sin(phi) * np.sin(theta)
-        z = radius * np.cos(phi)
+    for point in halton_seq:
+        phi = np.pi * point[0]
+        theta = 2 * np.pi * point[1]
+        r = radius * point[2]
+        x = r * np.sin(phi) * np.cos(theta)
+        y = r * np.sin(phi) * np.sin(theta)
+        z = r * np.cos(phi)
         positions.append((x, y, z))
     return positions
 
