@@ -74,6 +74,28 @@ def generate_camera_intrinsics(fx, fy, cx, cy):
                      [0, 0, 1]])
 
 
+def generate_interior_camera_positions(mesh, num_views):
+    # Calculate the bounding box of the mesh
+    bounds = mesh.bounds
+    print(f"Mesh bounds: {bounds}")
+    
+    # Ensure the bounds array has the expected size
+    if bounds.shape != (2, 3):
+        raise ValueError("Bounds array does not have the expected size of 2x3 elements.")
+    
+    min_x, min_y, min_z = bounds[0]
+    max_x, max_y, max_z = bounds[1]
+    
+    # Generate positions within the bounding box
+    positions = []
+    for _ in range(num_views):
+        x = np.random.uniform(min_x, max_x)
+        y = np.random.uniform(min_y, max_y)
+        z = np.random.uniform(min_z, max_z)
+        positions.append((x, y, z))
+    
+    return positions
+
 def generate_camera_positions(num_views, radius):
     positions = []
     for i in range(num_views):
@@ -86,10 +108,12 @@ def generate_camera_positions(num_views, radius):
     return positions
 
 
-def render_images(pv_mesh, texture, camera_positions, intrinsics, output_dir):
+def render_images(pv_mesh, texture, camera_positions, intrinsics, output_dir, show_scalar_bar=False):
     plotter = pv.Plotter(off_screen=True)
-    plotter.add_mesh(pv_mesh, texture=texture, show_scalar_bar=False)
-    plotter.add_light(pv.Light(position=(5, 5, 5), focal_point=(0, 0, 0), color='white'))
+    plotter.add_mesh(pv_mesh, texture=texture, show_scalar_bar=show_scalar_bar)
+    
+    # Adding internal lighting
+    plotter.add_light(pv.Light(position=(0, 0, 2), focal_point=(0, 0, 0), color='white', intensity=1.0))
 
     os.makedirs(output_dir, exist_ok=True)
 
