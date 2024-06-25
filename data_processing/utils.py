@@ -9,27 +9,35 @@ def generate_camera_intrinsics(fx, fy, cx, cy):
                      [0, fy, cy],
                      [0, 0, 1]])
 
-def generate_camera_positions(num_views, radius):
+def generate_spiral_camera_positions(num_views, radius, height, rotations=2):
     positions = []
+    height_step = height / num_views
+    theta_step = 2 * np.pi * rotations / num_views
+    
     for i in range(num_views):
-        phi = np.pi * (i / num_views)  # Varying from 0 to π
-        theta = 2 * np.pi * (i / num_views)  # Varying from 0 to 2π
-        x = radius * np.sin(phi) * np.cos(theta)
-        y = radius * np.sin(phi) * np.sin(theta)
-        z = radius * np.cos(phi)
+        theta = i * theta_step
+        x = radius * np.cos(theta)
+        y = height / 2 - i * height_step
+        z = radius * np.sin(theta)
         positions.append((x, y, z))
-    return positions
 
+    return positions
 
 def render_images(plotter, camera_positions, intrinsics, output_dir):
     os.makedirs(output_dir, exist_ok=True)
 
+    plotter.add_light(pv.Light(position=(5, 5, 5), focal_point=(0, 0, 0), color='white', intensity=1.0))
+    plotter.add_light(pv.Light(position=(-5, 5, 5), focal_point=(0, 0, 0), color='white', intensity=0.8))
+    plotter.add_light(pv.Light(position=(5, -5, 5), focal_point=(0, 0, 0), color='white', intensity=0.6))
     camera_data = []
 
     for i, position in enumerate(camera_positions):
         try:
             focal_point = [0, 0, 0]
-            view_up = [0, 0, 1]
+            view_up = [0, 1, 0]
+            
+            if position[1] < 0:
+                focal_point[1] = position[1] / 2  
 
             print(f"Rendering image {i}:")
             print(f"Position: {position}")
@@ -37,7 +45,6 @@ def render_images(plotter, camera_positions, intrinsics, output_dir):
             print(f"View Up: {view_up}")
 
             plotter.camera_position = [position, focal_point, view_up]
-            plotter.camera.zoom(1)
             plotter.render()
 
             screenshot = plotter.screenshot(transparent_background=False)
