@@ -18,9 +18,11 @@ def generate_object():
     cx, cy = 640, 480
     intrinsics = generate_camera_intrinsics(fx, fy, cx, cy)
 
-    num_views = 150
-    radius = 2
-    camera_positions = generate_camera_positions(num_views, radius)
+    num_views = 125
+    radius = 1
+    height = 3
+    rotations = 10  # Increase the number of rotations
+    camera_positions = generate_spiral_camera_positions(num_views, radius, height, rotations)
 
     camera_data = render_images(pl, camera_positions, intrinsics, output_dir)
 
