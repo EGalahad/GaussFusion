@@ -338,6 +338,7 @@ class GaussianModel:
             bg_color = self.bg_color
         return render(cam, self, None, bg_color, scaling_modifier, override_color)
 
+
 class HybridGaussianModel(GaussianModel):
     def __init__(self, sh_degree: int):
         """Hybrid Gaussian Model that can combine background and object models. It will support dynamics adjustments of the object offset and size/scaling with methods like set_offset, set_scaling, etc.
@@ -350,19 +351,21 @@ class HybridGaussianModel(GaussianModel):
         self._scaling_bg = torch.empty(0)
         self._rotation_bg = torch.empty(0)
         self._opacity_bg = torch.empty(0)
-        
+
         self._xyz_obj = torch.empty(0)
         self._features_dc_obj = torch.empty(0)
         self._features_rest_obj = torch.empty(0)
         self._scaling_obj = torch.empty(0)
         self._rotation_obj = torch.empty(0)
         self._opacity_obj = torch.empty(0)
-        
-        self.object_offset = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float, device="cuda")
+
+        self.object_offset = torch.tensor(
+            [0.0, 0.0, 0.0], dtype=torch.float, device="cuda"
+        )
         self.object_scaling = torch.tensor(1.0, dtype=torch.float, device="cuda")
-        
+
         self.bg_len = 0
-        
+
     def load_ply(self, path_bg, path_obj, rot_bg=None, clip_radius=0.5):
         super().load_ply(path_bg)
         self._xyz_bg = self._xyz
@@ -377,8 +380,7 @@ class HybridGaussianModel(GaussianModel):
             self._xyz_bg = torch.matmul(self._xyz_bg, rot_bg)
             self._features_dc_bg = torch.matmul(self._features_dc_bg, rot_bg)
             self._features_rest_bg = torch.matmul(self._features_rest_bg, rot_bg)
-            
-            
+
         super().load_ply(path_obj)
         self._xyz_obj = self._xyz
         self._features_dc_obj = self._features_dc
@@ -386,10 +388,10 @@ class HybridGaussianModel(GaussianModel):
         self._scaling_obj = self._scaling
         self._rotation_obj = self._rotation
         self._opacity_obj = self._opacity
-        
+
         # clip the points of object with a radius
         offset = torch.tensor([0.0, 0.0, 0.4], dtype=torch.float, device="cuda")
-        dist = torch.norm(self._xyz_obj - offset , dim=1)
+        dist = torch.norm(self._xyz_obj - offset, dim=1)
         mask = dist < clip_radius
         self._xyz_obj = self._xyz_obj[mask]
         self._features_dc_obj = self._features_dc_obj[mask]
@@ -397,36 +399,49 @@ class HybridGaussianModel(GaussianModel):
         self._scaling_obj = self._scaling_obj[mask]
         self._rotation_obj = self._rotation_obj[mask]
         self._opacity_obj = self._opacity_obj[mask]
-        print(f"original object points: {len(dist)}, clipped object points: {len(self._xyz_obj)}")
-        
+        print(
+            f"original object points: {len(dist)}, clipped object points: {len(self._xyz_obj)}"
+        )
+
         # concatenate background and object points
         self._xyz = torch.cat((self._xyz_bg, self._xyz_obj), dim=0)
-        self._features_dc = torch.cat((self._features_dc_bg, self._features_dc_obj), dim=0)
-        self._features_rest = torch.cat((self._features_rest_bg, self._features_rest_obj), dim=0)
+        self._features_dc = torch.cat(
+            (self._features_dc_bg, self._features_dc_obj), dim=0
+        )
+        self._features_rest = torch.cat(
+            (self._features_rest_bg, self._features_rest_obj), dim=0
+        )
         self._scaling = torch.cat((self._scaling_bg, self._scaling_obj), dim=0)
         self._rotation = torch.cat((self._rotation_bg, self._rotation_obj), dim=0)
         self._opacity = torch.cat((self._opacity_bg, self._opacity_obj), dim=0)
-        
+
     def set_offset(self, offset):
         self.object_offset[0] = offset[0]
         self.object_offset[1] = offset[1]
         self.object_offset[2] = offset[2]
         self._update()
-    
+
     def set_scaling(self, scaling):
         self.object_scaling.fill_(scaling)
         self._update()
-    
+
     def _update(self):
-        self._xyz[self.bg_len:] = self._xyz_obj * self.object_scaling + self.object_offset
-        self._scaling[self.bg_len:] = self._scaling_obj + torch.log(self.object_scaling)
+        self._xyz[self.bg_len :] = (
+            self._xyz_obj * self.object_scaling + self.object_offset
+        )
+        self._scaling[self.bg_len :] = self._scaling_obj + torch.log(
+            self.object_scaling
+        )
 
 
 if __name__ == "__main__":
     # gm = GaussianModel(3)
     # gm.load_ply("/home/elijah/Documents/cv_project/weng-wong-project-cv/object.ply")
     gm = HybridGaussianModel(3)
-    gm.load_ply("/home/elijah/Documents/cv_project/weng-wong-project-cv/train.ply", "/home/elijah/Documents/cv_project/weng-wong-project-cv/object.ply")
+    gm.load_ply(
+        "/home/elijah/Documents/cv_project/weng-wong-project-cv/train.ply",
+        "/home/elijah/Documents/cv_project/weng-wong-project-cv/object.ply",
+    )
     gm.set_scaling(1.2)
     # w2c = torch.tensor(
     #     [
@@ -466,7 +481,14 @@ if __name__ == "__main__":
     # torchvision.utils.save_image(image, "test_tv.png")
 
     # image = image.detach().cpu().numpy().transpose(1, 2, 0)
-    image = image.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0).to("cpu", torch.uint8).numpy()
+    image = (
+        image.mul(255)
+        .add_(0.5)
+        .clamp_(0, 255)
+        .permute(1, 2, 0)
+        .to("cpu", torch.uint8)
+        .numpy()
+    )
     import cv2
 
     cv2.imwrite("test.png", cv2.cvtColor(image, cv2.COLOR_RGB2BGR))

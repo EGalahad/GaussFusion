@@ -56,8 +56,8 @@ To generate images from different views of a downloaded 3D model, use the follow
 
 ```bash
 python data_processing/model_view_renderer.py \
-    --input_path /path/to/your/3d/model \
-    --output_path $PROJECT_PATH/images
+    -i /path/to/your/3d/model.gltf \
+    -o $PROJECT_PATH
 ```
 
 This script also generates a `cameras.json` file containing the camera parameters for each view.
@@ -68,8 +68,8 @@ To generate images from a video scan, run:
 
 ```bash
 python data_processing/video_frame_extractor.py \
-    --input_path /path/to/your/video \
-    --output_path $PROJECT_PATH/images
+    -i /path/to/your/video \
+    -o $PROJECT_PAT/
 ```
 
 ### COLMAP Instructions
@@ -94,10 +94,9 @@ If your 3D model images are not captured at contiguous locations, use `exhaustiv
 Ensure the `cameras.json` file is generated before proceeding:
 
 ```bash
-python data_processing/create_sparse_model_from_json.py \
-    $PROJECT_PATH/cameras.json \
-    $PROJECT_PATH/database.db \
-    $PROJECT_PATH/sparse/predefined
+python data_processing/model_to_sparse_colmap.py \
+    -i $PROJECT_PATH \
+    -o $PROJECT_PATH/sparse/predefined
 
 colmap point_triangulator \
     --database_path $PROJECT_PATH/database.db \
@@ -120,9 +119,9 @@ colmap mapper \
 We need a further step to make the coordinate of sparse model align with the actual world coordinate, e.g. gravity points to the negative z-axis. We can use the following script to rotate the sparse model:
 
 ```bash
-python data_processing/rotate_sparse_model.py \
-    --input_path $PROJECT_PATH/sparse \
-    --output_path $PROJECT_PATH/sparse_transformed
+python data_processing/video_rotate_sparse_model.py \
+    -i$PROJECT_PATH/sparse \
+    -o$PROJECT_PATH/sparse_transformed
 ```
 
 **Visualize Sparse Model**
@@ -137,8 +136,8 @@ Since the distributed system saves one `.ply` file for each GPU, you can use the
 
 ```bash
 python visualizer/merge_ply.py \
-    --input_path /path/to/your/ply/files \
-    --output_path /path/to/your/output/ply/file
+    -i /path/to/your/ply/files \
+    -o /path/to/your/output/ply/file
 ```
 
 

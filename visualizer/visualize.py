@@ -1,4 +1,5 @@
 """Credit to https://github.com/WangFeng18/3d-gaussian-splatting"""
+
 import torch
 import numpy as np
 import viser
@@ -45,7 +46,9 @@ def get_w2c(camera):
 
 
 class ViserViewer:
-    def __init__(self, device, viewer_port, init_offset=[0.0, 0.0, 0.0], init_scaling=1.0):
+    def __init__(
+        self, device, viewer_port, init_offset=[0.0, 0.0, 0.0], init_scaling=1.0
+    ):
         self.device = device
         self.port = viewer_port
         self.gaussian_model = None
@@ -82,11 +85,11 @@ class ViserViewer:
         self.scale_slider = self.server.gui.add_slider(
             "Object Scale", min=0.1, max=5.0, step=0.1, initial_value=1.0
         )
-        
+
         self.object_offset = self.server.gui.add_text(
             "Object Offset", initial_value="0.00 0.00 0.00", disabled=True
         )
-        
+
         self.init_offset = init_offset
         self.init_scaling = init_scaling
 
@@ -125,9 +128,21 @@ class ViserViewer:
         if self.gaussian_model is not None and isinstance(
             self.gaussian_model, HybridGaussianModel
         ):
-            x = self.x_slider_coarse.value + self.x_slider_fine.value + self.init_offset[0]
-            y = self.y_slider_coarse.value + self.y_slider_fine.value + self.init_offset[1]
-            z = self.z_slider_coarse.value + self.z_slider_fine.value + self.init_offset[2]
+            x = (
+                self.x_slider_coarse.value
+                + self.x_slider_fine.value
+                + self.init_offset[0]
+            )
+            y = (
+                self.y_slider_coarse.value
+                + self.y_slider_fine.value
+                + self.init_offset[1]
+            )
+            z = (
+                self.z_slider_coarse.value
+                + self.z_slider_fine.value
+                + self.init_offset[2]
+            )
             self.gaussian_model.set_offset([x, y, z])
             self.object_offset.value = f"{x:.2f} {y:.2f} {z:.2f}"
             self.need_update = True
@@ -195,23 +210,42 @@ class ViserViewer:
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Run HybridGaussianModel with Viser GUI")
-    
-    parser.add_argument("--bg_path", type=str, required=True, help="Path to the background PLY file")
-    parser.add_argument("--obj_path", type=str, required=True, help="Path to the object PLY file")
-    parser.add_argument("--offset", type=float, nargs=3, default=[0.0, 0.0, 0.0], 
-                        help="Initial offset for the object (x y z)")
-    parser.add_argument("--scaling", type=float, default=1.0, 
-                        help="Initial scaling for the object")
-    parser.add_argument("--port", type=int, default=6789, 
-                        help="Port number for the Viser server")
+
+    parser = argparse.ArgumentParser(
+        description="Run HybridGaussianModel with Viser GUI"
+    )
+
+    parser.add_argument(
+        "--back_ground", type=str, required=True, help="Path to the background PLY file"
+    )
+    parser.add_argument(
+        "--object", type=str, required=True, help="Path to the object PLY file"
+    )
+    parser.add_argument(
+        "--offset",
+        type=float,
+        nargs=3,
+        default=[0.0, 0.0, 0.0],
+        help="Initial offset for the object (x y z)",
+    )
+    parser.add_argument(
+        "--scaling", type=float, default=1.0, help="Initial scaling for the object"
+    )
+    parser.add_argument(
+        "--port", type=int, default=6789, help="Port number for the Viser server"
+    )
 
     args = parser.parse_args()
 
     gm = HybridGaussianModel(3)
-    gm.load_ply(args.bg_path, args.obj_path)
+    gm.load_ply(args.back_ground, args.object)
 
-    gui = ViserViewer(device="cuda", viewer_port=args.port, init_offset=args.offset, init_scaling=args.scaling)
+    gui = ViserViewer(
+        device="cuda",
+        viewer_port=args.port,
+        init_offset=args.offset,
+        init_scaling=args.scaling,
+    )
     gui.set_renderer(gm)
 
     try:

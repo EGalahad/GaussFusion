@@ -30,14 +30,10 @@ def transform_coordinate_system(input_folder, output_folder):
     print(f"Rotation matrix: {R_base}")
     print(f"View direction: {view}")
     print(f"Up direction: {up}")
-    
+
     # required rotation: align camera y with world -z and camera x with world x
-    R_align = np.array([
-        [1, 0, 0],
-        [0, 0, 1],
-        [0, -1, 0]
-    ])
-    
+    R_align = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
+
     # The total transformation is R_align * R_base_inv
     R_transform = np.dot(R_align, R_base.T)
     # R_transform = np.array([[0, 0, -1], [1, 0, 0], [0, -1, 0]])
@@ -46,15 +42,15 @@ def transform_coordinate_system(input_folder, output_folder):
     transformed_images = {}
     for image_id, image in images.items():
         R_original = qvec2rotmat(image.qvec)
-        
+
         # New rotation: R_new = R_transform * R_original
         R_new = np.dot(R_original, R_transform.T)
         qvec_new = rotmat2qvec(R_new)
-        
+
         # New translation: T_new = R_transform * T_original
         # tvec_new = np.dot(R_transform, image.tvec)
         tvec_new = image.tvec
-        
+
         transformed_images[image_id] = Image(
             id=image.id,
             qvec=qvec_new,
@@ -62,7 +58,7 @@ def transform_coordinate_system(input_folder, output_folder):
             camera_id=image.camera_id,
             name=image.name,
             xys=image.xys,
-            point3D_ids=image.point3D_ids
+            point3D_ids=image.point3D_ids,
         )
 
     # Transform all 3D points
@@ -77,9 +73,8 @@ def transform_coordinate_system(input_folder, output_folder):
             rgb=point3D.rgb,
             error=point3D.error,
             image_ids=point3D.image_ids,
-            point2D_idxs=point3D.point2D_idxs
+            point2D_idxs=point3D.point2D_idxs,
         )
-
 
     # Write the transformed images and points to new binary files
     write_images_binary(transformed_images, os.path.join(output_folder, "images.bin"))
@@ -101,10 +96,12 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-i",
         "--input_path",
         help="Path to the folder that contains images.bin and points3D.bin",
     )
     parser.add_argument(
+        "-o",
         "--output_path",
         help="Path to the folder where the transformed images.bin and points3D.bin will be saved",
     )

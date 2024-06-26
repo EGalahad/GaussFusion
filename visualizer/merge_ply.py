@@ -4,7 +4,9 @@ import os
 
 
 def merge_ply_files(folder, output_file):
-    file_list = [f"{folder}/{file}" for file in os.listdir(folder) if file.endswith(".ply")]
+    file_list = [
+        f"{folder}/{file}" for file in os.listdir(folder) if file.endswith(".ply")
+    ]
     combined_ply = PlyData.read(file_list[0])
     vertices = combined_ply["vertex"].data
 
@@ -21,8 +23,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", type=str, required=True)
-    parser.add_argument("--output_path", type=str, required=True)
+    parser.add_argument("-i", "--input_path", type=str, required=True)
+    parser.add_argument("-o", "--output_path", type=str, required=True)
     args = parser.parse_args()
 
     merge_ply_files(args.input_path, args.output_path)
