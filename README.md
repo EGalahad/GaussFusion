@@ -68,7 +68,7 @@ To generate images from a video scan, run:
 
 ```bash
 python data_processing/video_frame_extractor.py \
-    -i /path/to/your/video \
+    -i /path/to/your/video.mp4 \
     -o $PROJECT_PAT/
 ```
 
@@ -120,8 +120,8 @@ We need a further step to make the coordinate of sparse model align with the act
 
 ```bash
 python data_processing/video_rotate_sparse_model.py \
-    -i$PROJECT_PATH/sparse \
-    -o$PROJECT_PATH/sparse_transformed
+    -i $PROJECT_PATH/sparse \
+    -o $PROJECT_PATH/sparse_transformed
 ```
 
 **Visualize Sparse Model**
@@ -137,7 +137,7 @@ Since the distributed system saves one `.ply` file for each GPU, you can use the
 ```bash
 python visualizer/merge_ply.py \
     -i /path/to/your/ply/files \
-    -o /path/to/your/output/ply/file
+    -o /path/to/your/output/ply/file.ply
 ```
 
 
