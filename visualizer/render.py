@@ -35,11 +35,7 @@ def render(viewpoint_camera: Camera, pc, pipe, bg_color : torch.Tensor, scaling_
     """
  
     # Create zero tensor. We will use it to make pytorch return gradients of the 2D (screen-space) means
-    screenspace_points = torch.zeros_like(pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda") + 0
-    try:
-        screenspace_points.retain_grad()
-    except:
-        pass
+    screenspace_points = torch.zeros_like(pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=False, device="cuda") + 0
 
     # Set up rasterization configuration
     tanfovx = math.tan(viewpoint_camera.FoVx * 0.5)
@@ -58,7 +54,7 @@ def render(viewpoint_camera: Camera, pc, pipe, bg_color : torch.Tensor, scaling_
         campos=viewpoint_camera.camera_center,
         prefiltered=False,
         # debug=pipe.debug
-        debug=True
+        debug=False
     )
 
     rasterizer = GaussianRasterizer(raster_settings=raster_settings)

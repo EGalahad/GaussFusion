@@ -359,11 +359,11 @@ class HybridGaussianModel(GaussianModel):
         self._opacity_obj = torch.empty(0)
         
         self.object_offset = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float, device="cuda")
-        self.object_scaling = torch.tensor([1.0, 1.0, 1.0], dtype=torch.float, device="cuda")
+        self.object_scaling = torch.tensor(1.0, dtype=torch.float, device="cuda")
         
         self.bg_len = 0
         
-    def load_ply(self, path_bg, path_obj, rot_bg=None, clip_radius=0.7):
+    def load_ply(self, path_bg, path_obj, rot_bg=None, clip_radius=0.5):
         super().load_ply(path_bg)
         self._xyz_bg = self._xyz
         self._features_dc_bg = self._features_dc
@@ -388,7 +388,8 @@ class HybridGaussianModel(GaussianModel):
         self._opacity_obj = self._opacity
         
         # clip the points of object with a radius
-        dist = torch.norm(self._xyz_obj - self.object_offset, dim=1)
+        offset = torch.tensor([0.0, 0.0, 0.4], dtype=torch.float, device="cuda")
+        dist = torch.norm(self._xyz_obj - offset , dim=1)
         mask = dist < clip_radius
         self._xyz_obj = self._xyz_obj[mask]
         self._features_dc_obj = self._features_dc_obj[mask]
@@ -413,12 +414,12 @@ class HybridGaussianModel(GaussianModel):
         self._update()
     
     def set_scaling(self, scaling):
-        self.object_scaling = scaling
+        self.object_scaling.fill_(scaling)
         self._update()
     
     def _update(self):
         self._xyz[self.bg_len:] = self._xyz_obj * self.object_scaling + self.object_offset
-        self._scaling[self.bg_len:] = self._scaling_obj + np.log(self.object_scaling)
+        self._scaling[self.bg_len:] = self._scaling_obj + torch.log(self.object_scaling)
 
 
 if __name__ == "__main__":

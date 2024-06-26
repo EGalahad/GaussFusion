@@ -1,9 +1,7 @@
-from threading import Thread
+"""Credit to https://github.com/WangFeng18/3d-gaussian-splatting"""
 import torch
 import numpy as np
-import time
 import viser
-import viser.transforms as tf
 from collections import deque
 from gaussian_model import GaussianModel, HybridGaussianModel
 
@@ -47,7 +45,7 @@ def get_w2c(camera):
 
 
 class ViserViewer:
-    def __init__(self, device, viewer_port):
+    def __init__(self, device, viewer_port, init_offset=[0.0, 0.0, 0.0], init_scaling=1.0):
         self.device = device
         self.port = viewer_port
         self.gaussian_model = None
@@ -56,15 +54,45 @@ class ViserViewer:
         self.render_times = deque(maxlen=3)
 
         self.server = viser.ViserServer(port=self.port)
-        self.resolution_slider = self.server.add_gui_slider(
+        self.resolution_slider = self.server.gui.add_slider(
             "Resolution", min=384, max=4096, step=2, initial_value=1024
         )
-        self.fps = self.server.add_gui_text("FPS", initial_value="-1", disabled=True)
-        self.camera_pos = self.server.add_gui_text(
-            "Camera Position", initial_value="0 0 0", disabled=True
+
+        self.x_slider_coarse = self.server.gui.add_slider(
+            "Object X (Coarse)", min=-5.0, max=5.0, step=0.1, initial_value=0.0
         )
-        self.camera_ori = self.server.add_gui_text(
-            "Camera Orientation", initial_value="0 0 0 1", disabled=True
+        self.x_slider_fine = self.server.gui.add_slider(
+            "Object X (Fine)", min=-0.1, max=0.1, step=0.001, initial_value=0.0
+        )
+
+        self.y_slider_coarse = self.server.gui.add_slider(
+            "Object Y (Coarse)", min=-5.0, max=5.0, step=0.1, initial_value=0.0
+        )
+        self.y_slider_fine = self.server.gui.add_slider(
+            "Object Y (Fine)", min=-0.1, max=0.1, step=0.001, initial_value=0.0
+        )
+
+        self.z_slider_coarse = self.server.gui.add_slider(
+            "Object Z (Coarse)", min=-5.0, max=5.0, step=0.1, initial_value=0.0
+        )
+        self.z_slider_fine = self.server.gui.add_slider(
+            "Object Z (Fine)", min=-0.1, max=0.1, step=0.001, initial_value=0.0
+        )
+
+        self.scale_slider = self.server.gui.add_slider(
+            "Object Scale", min=0.1, max=5.0, step=0.1, initial_value=1.0
+        )
+        
+        self.object_offset = self.server.gui.add_text(
+            "Object Offset", initial_value="0.00 0.00 0.00", disabled=True
+        )
+        
+        self.init_offset = init_offset
+        self.init_scaling = init_scaling
+
+        self.fps = self.server.gui.add_text("FPS", initial_value="-1", disabled=True)
+        self.camera_pos = self.server.gui.add_text(
+            "Camera Position", initial_value="0 0 0", disabled=True
         )
 
         self.c2ws = []
@@ -74,11 +102,43 @@ class ViserViewer:
         def _(_):
             self.need_update = True
 
+        @self.x_slider_coarse.on_update
+        @self.x_slider_fine.on_update
+        @self.y_slider_coarse.on_update
+        @self.y_slider_fine.on_update
+        @self.z_slider_coarse.on_update
+        @self.z_slider_fine.on_update
+        def _(_):
+            self.update_object_position()
+
+        @self.scale_slider.on_update
+        def _(_):
+            self.update_object_scale()
+
         @self.server.on_client_connect
         def _(client: viser.ClientHandle):
             @client.camera.on_update
             def _(_):
                 self.need_update = True
+
+    def update_object_position(self):
+        if self.gaussian_model is not None and isinstance(
+            self.gaussian_model, HybridGaussianModel
+        ):
+            x = self.x_slider_coarse.value + self.x_slider_fine.value + self.init_offset[0]
+            y = self.y_slider_coarse.value + self.y_slider_fine.value + self.init_offset[1]
+            z = self.z_slider_coarse.value + self.z_slider_fine.value + self.init_offset[2]
+            self.gaussian_model.set_offset([x, y, z])
+            self.object_offset.value = f"{x:.2f} {y:.2f} {z:.2f}"
+            self.need_update = True
+
+    def update_object_scale(self):
+        if self.gaussian_model is not None and isinstance(
+            self.gaussian_model, HybridGaussianModel
+        ):
+            scale = self.scale_slider.value * self.init_scaling
+            self.gaussian_model.set_scaling(scale)
+            self.need_update = True
 
     def set_renderer(self, gaussian_model: GaussianModel):
         self.gaussian_model = gaussian_model
@@ -125,50 +185,37 @@ class ViserViewer:
                     print(e)
                     interval = 1
                     continue
-                client.set_background_image(out, format="jpeg")
+                client.scene.set_background_image(out, format="png")
 
                 self.render_times.append(interval)
                 self.fps.value = f"{1.0 / np.mean(self.render_times):.3g}"
-                self.camera_pos.value = f"{camera.position[0]:.3g} {camera.position[1]:.3g} {camera.position[2]:.3g}"
+                self.camera_pos.value = f"{camera.position[0]:.2f} {camera.position[1]:.2f} {camera.position[2]:.2f}"
                 # use the ray through camera center to represent the orientation
-                ray = camera.wxyz[1:] * 2
-                self.camera_ori.value = f"{ray[0]:.3g} {ray[1]:.3g} {ray[2]:.3g}"
 
-
-# position = [1.1999999999999997, 9.992007221626408e-17, 1.6000000000000005]
-# rotation = [[6.118467770994851e-17, 0.734803444627488, -0.6782801027330655], [1.0, 6.118467770994851e-17, -5.647816403995245e-17], [-5.647816403995245e-17, -0.6782801027330655, -0.734803444627488]]
-
-# c2w = np.eye(4)
-# c2w[:3, :3] = rotation
-# c2w[:3, 3] = position
-
-# w2c = np.linalg.inv(c2w)
-# view_matrix = w2c.transpose()
-# # print(w2c)
-# # print(view_matrix)
-
-# fx = fy = 800.
-# width, height = 1024, 768
-
-# intrinsics_matrix = np.eye(4)
-# intrinsics_matrix[0, 0] = 2 * fx / width
-# intrinsics_matrix[1, 1] = 2 * fy / height
-# intrinsics_matrix[2, 3] = 1
-# intrinsics_matrix[3, 3] = 0
-
-# full_proj_tf = view_matrix @ intrinsics_matrix
-# print(full_proj_tf * (full_proj_tf > 1e-3))
-
-# exit(0)
 
 if __name__ == "__main__":
-    path_bg = "/home/elijah/Documents/cv_project/weng-wong-project-cv/train.ply"
-    path_obj = "/home/elijah/Documents/cv_project/weng-wong-project-cv/object.ply"
+    import argparse
+    parser = argparse.ArgumentParser(description="Run HybridGaussianModel with Viser GUI")
+    
+    parser.add_argument("--bg_path", type=str, required=True, help="Path to the background PLY file")
+    parser.add_argument("--obj_path", type=str, required=True, help="Path to the object PLY file")
+    parser.add_argument("--offset", type=float, nargs=3, default=[0.0, 0.0, 0.0], 
+                        help="Initial offset for the object (x y z)")
+    parser.add_argument("--scaling", type=float, default=1.0, 
+                        help="Initial scaling for the object")
+    parser.add_argument("--port", type=int, default=6789, 
+                        help="Port number for the Viser server")
+
+    args = parser.parse_args()
+
     gm = HybridGaussianModel(3)
-    gm.load_ply(path_bg, path_obj)
-    gm.set_scaling(1.2)
-    gm.set_offset([1, 0, 0])
-    gui = ViserViewer(device="cuda", viewer_port=6789)
+    gm.load_ply(args.bg_path, args.obj_path)
+
+    gui = ViserViewer(device="cuda", viewer_port=args.port, init_offset=args.offset, init_scaling=args.scaling)
     gui.set_renderer(gm)
-    while True:
-        gui.update()
+
+    try:
+        while True:
+            gui.update()
+    except KeyboardInterrupt:
+        pass

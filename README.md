@@ -133,6 +133,15 @@ Now the sparse model will be created under the `sparse_transformed/0,1,2,...` di
 
 For training the Gaussian Splatting model, please refer to [Grendal-GS](https://github.com/nyu-systems/Grendal-GS).
 
+Since the distributed system saves one `.ply` file for each GPU, you can use the following script to merge them in to a single `.ply` file:
+
+```bash
+python visualizer/merge_ply.py \
+    --input_path /path/to/your/ply/files \
+    --output_path /path/to/your/output/ply/file
+```
+
+
 ## Visualization
 
 To visualize the Gaussian Splatting model, we offer a simple visualizer. Ensure you have a CUDA-compatible GPU and sufficient memory:
