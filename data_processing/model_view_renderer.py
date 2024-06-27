@@ -4,6 +4,7 @@ import cv2
 import os
 import json
 
+pv.start_xvfb()
 
 def generate_camera_intrinsics(fx, fy, cx, cy):
     return np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
@@ -64,12 +65,10 @@ def render_images(
             ]
 
             # reorder the y z coordinate for the position and rotation matrix
-            position = [position[0], position[2], -position[1]]
-            rotate = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
-            rotation_matrix = np.dot(rotation_matrix, rotate)
-            rotation_matrix = [
-                [rotation_matrix[j, k] for k in range(3)] for j in range(3)
-            ]
+            position = [position[0], -position[2], position[1]]
+            rotate = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+            rotation_matrix = np.dot(rotation_matrix, rotate.T)
+            rotation_matrix = rotation_matrix.tolist()
 
             camera_data.append(
                 {
@@ -151,6 +150,7 @@ if __name__ == "__main__":
     parser.add_argument("--cx", type=float, default=640, help="Principal point x")
     parser.add_argument("--cy", type=float, default=480, help="Principal point y")
     parser.add_argument(
+        "-n",
         "--num_views", type=int, default=100, help="Number of views to generate"
     )
     parser.add_argument(

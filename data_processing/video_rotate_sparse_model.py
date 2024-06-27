@@ -35,7 +35,7 @@ def transform_coordinate_system(input_folder, output_folder):
     R_align = np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
 
     # The total transformation is R_align * R_base_inv
-    R_transform = np.dot(R_align, R_base.T)
+    R_transform = np.dot(R_align, R_base)
     # R_transform = np.array([[0, 0, -1], [1, 0, 0], [0, -1, 0]])
 
     # Transform all images

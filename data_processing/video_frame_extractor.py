@@ -44,7 +44,11 @@ if __name__ == "__main__":
         "-o", "--output_path", type=str, help="Output folder for extracted frames"
     )
     parser.add_argument(
-        "-n", "--num_frames", type=int, help="Number of frames to extract, e.g. 300"
+        "-n",
+        "--num_frames",
+        type=int,
+        default=300,
+        help="Number of frames to extract, e.g. 300",
     )
     args = parser.parse_args()
 
