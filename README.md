@@ -46,9 +46,9 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
 <p style="text-align: center;">Multi-resolution rendering enables trade-off between visual quality and performance.</p> -->
 
 <p align="center">
-  <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" width="30%" />
-  <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" width="30%" />
-  <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" width="30%" />
+  <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" width="32%" />
+  <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" width="32%" />
+    <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" width="32%" />
 </p>
 
 <p align="center">
@@ -192,6 +192,17 @@ python data_processing/video_rotate_sparse_model.py \
 
 Now the sparse model will be created under the `sparse_transformed/0,1,2,...` directory. You can visualize the sparse model using colmap gui (`File > import model` under Ubuntu) to check the validity of the sparse model.
 
+<div style="text-align:center">
+  <img src="assets/bonsai_colmap.png" alt="bonsai colmap" width="45%" />
+  <img src="assets/desktop_colmap.png" alt="desktop colmap" width="45%" />
+</div>
+<p align="center">
+  <em>Figure 3a: Bonsai Sparse Model (3D synthetic model) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 3b: Desktop Sparse Model (Video scan)</em>
+</p>
+<p align="center">
+  Example visualizations of the sparse model in COLMAP GUI.
+</p>
+
 ## Gaussian Splatting Training
 
 For training the Gaussian Splatting model, please refer to [Grendal-GS](https://github.com/nyu-systems/Grendal-GS).
@@ -217,3 +228,7 @@ python visualizer/visualize.py \
 ```
 
 Open your browser and navigate to `http://localhost:8080` to view the visualization.
+
+<div style="text-align:center">
+  <img src="assets/visualizer_demo.png" alt="visualizer demo" width="90%" />
+</div>
