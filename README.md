@@ -69,10 +69,10 @@ To generate images from a video scan, run:
 ```bash
 python data_processing/video_frame_extractor.py \
     -i /path/to/your/video.mp4 \
-    -o $PROJECT_PAT/
+    -o $PROJECT_PATH
 ```
 
-### COLMAP Instructions
+### COLMAP Feature Matching and Reconstruction
 
 To create the sparse model with 3D keypoints and camera parameters, use the [COLMAP](https://github.com/colmap/colmap) library. The initial steps are the same for both 3D models and video scans:
 
@@ -87,6 +87,8 @@ colmap sequential_matcher \
     --database_path $PROJECT_PATH/database.db
 ```
 
+If your colmap installation does not support GPU, add `--SiftExtraction.use_gpu=false` to the `feature_extractor` command and `--SiftMatching.use_gpu=false` to the `sequential_matcher` command.
+
 If your 3D model images are not captured at contiguous locations, use `exhaustive_matcher` instead of `sequential_matcher`.
 
 **3D Model**
@@ -98,6 +100,7 @@ python data_processing/model_to_sparse_colmap.py \
     -i $PROJECT_PATH \
     -o $PROJECT_PATH/sparse/predefined
 
+mkdir -p $PROJECT_PATH/sparse/0
 colmap point_triangulator \
     --database_path $PROJECT_PATH/database.db \
     --image_path $PROJECT_PATH/images \
@@ -110,18 +113,21 @@ The first command creates a COLMAP-compatible sparse model from the `cameras.jso
 **Video Scan**
 
 ```bash
+mkdir -p $PROJECT_PATH/sparse/raw
+
 colmap mapper \
     --database_path $PROJECT_PATH/database.db \
     --image_path $PROJECT_PATH/images \
-    --output_path $PROJECT_PATH/sparse
+    --output_path $PROJECT_PATH/sparse/raw
 ```
 
-We need a further step to make the coordinate of sparse model align with the actual world coordinate, e.g. gravity points to the negative z-axis. We can use the following script to rotate the sparse model:
+This command creates a sparse model from the video scan images. We need a further step to make the coordinate of sparse model align with the actual world coordinate, e.g. gravity points to the negative z-axis. We can use the following script to rotate the sparse model:
 
 ```bash
+mkdir -p $PROJECT_PATH/sparse/0
 python data_processing/video_rotate_sparse_model.py \
     -i $PROJECT_PATH/sparse \
-    -o $PROJECT_PATH/sparse_transformed
+    -o $PROJECT_PATH/sparse/0
 ```
 
 **Visualize Sparse Model**
@@ -136,7 +142,7 @@ Since the distributed system saves one `.ply` file for each GPU, you can use the
 
 ```bash
 python visualizer/merge_ply.py \
-    -i /path/to/your/ply/files \
+    -i /path/to/the/folder/that/contains/your/ply/files \
     -o /path/to/your/output/ply/file.ply
 ```
 
@@ -147,8 +153,8 @@ To visualize the Gaussian Splatting model, we offer a simple visualizer. Ensure 
 
 ```bash
 python visualizer/visualize.py \
-    --background /path/to/background/gaussian/splatting/model \
-    --object /path/to/object/gaussian/splatting/model \
+    --background /path/to/background/gaussian/splatting/model.ply \
+    --object /path/to/object/gaussian/splatting/model.ply \
     --port 8080
 ```
 
