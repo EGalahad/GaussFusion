@@ -1,7 +1,35 @@
-# Gaussian Splatting for 3D Object Integration
+# GaussFusion: Seamless 3D Object Integration using Gaussian Splatting
 **Computer Vision Final Project on 3D Gaussian Splatting**
 
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
+
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
+    <div style="flex: 1; max-width: 45%; text-align: center;">
+        <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" style="width: 100%; height: auto;"/>
+        <div>Figure 1a: Bonsai on Desktop</div>
+    </div>
+    <div style="flex: 1; max-width: 45%; text-align: center;">
+        <img src="assets/lamborghini_in_garage.png" alt="lamborghini in garage" style="width: 100%; height: auto;"/>
+        <div>Figure 1b: Lamborghini in Garage</div>
+    </div>
+</div>
+<p style="text-align: center;">Our plug-and-play merging visualizer supporting versatile object integration across different scenes.</p>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
+    <div style="flex: 1; max-width: 45%; text-align: center;">
+        <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" style="width: 100%; height: auto;"/>
+        <div>Figure 2a: 384p @ 60 FPS</div>
+    </div>
+    <div style="flex: 1; max-width: 45%; text-align: center;">
+        <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" style="width: 100%; height: auto;"/>
+        <div>Figure 2b: 1024p @ 35 FPS</div>
+    </div>
+    <div style="flex: 1; max-width: 45%; text-align: center;">
+        <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" style="width: 100%; height: auto;"/>
+        <div>Figure 2c: 3072p @ 8 FPS</div>
+    </div>
+</div>
+<p style="text-align: center;">Multi-resolution rendering enables trade-off between visual quality and performance.</p>
 
 ## Data Collection
 
