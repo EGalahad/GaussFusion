@@ -184,7 +184,7 @@ This command creates a sparse model from the video scan images. We need a furthe
 ```bash
 mkdir -p $PROJECT_PATH/sparse/0
 python data_processing/video_rotate_sparse_model.py \
-    -i $PROJECT_PATH/sparse \
+    -i $PROJECT_PATH/sparse/raw \
     -o $PROJECT_PATH/sparse/0
 ```
 
