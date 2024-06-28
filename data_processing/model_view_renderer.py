@@ -1,25 +1,29 @@
 import pyvista as pv
 import numpy as np
+import math
 import cv2
 import os
 import json
+import tqdm
 
 pv.start_xvfb()
 
-def generate_camera_intrinsics(fx, fy, cx, cy):
-    return np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+def generate_camera_intrinsics(f, cx, cy):
+    return np.array([[f, 0, cx], [0, f, cy], [0, 0, 1]])
 
 
-def generate_spiral_camera_positions(num_views, radius, height, rotations=2):
+def generate_spiral_camera_positions(num_views, radius, rotations):
     positions = []
+    height = 0.9 * radius * 2
     height_step = height / num_views
     theta_step = -2 * np.pi * rotations / num_views
 
     for i in range(num_views):
         theta = i * theta_step
-        x = radius * np.cos(theta)
         y = height / 2 - i * height_step
-        z = radius * np.sin(theta)
+        r = np.sqrt(radius**2 - y**2)
+        x = r * np.cos(theta)
+        z = r * np.sin(theta)
         positions.append((x, y, z))
 
     return positions
@@ -46,9 +50,10 @@ def render_images(
     camera_data = []
 
     view_up = [0, 1, 0]
-    for i, position in enumerate(camera_positions):
+    for i, position in tqdm.tqdm(enumerate(camera_positions), total=len(camera_positions)):
         try:
-            plotter.camera_position = [position, focal_point, view_up]
+            position_offset = [position[0] + focal_point[0], position[1] + focal_point[1], position[2] + focal_point[2]]
+            plotter.camera_position = [position_offset, focal_point, view_up]
             plotter.render()
 
             screenshot = plotter.screenshot(transparent_background=False)
@@ -91,42 +96,41 @@ def render_images(
     return camera_data
 
 
-def save_camera_data(camera_data, output_path):
-    with open(output_path, "w") as f:
-        json.dump(camera_data, f, indent=4)
-
-
 def generate_model_views(
     gltf_path: str,
     output_dir: str,
-    fx: float,
-    fy: float,
-    cx: float,
+    f: float,
+    cx: int,
     cy: float,
     num_views: int,
     radius: float,
-    height: float,
     rotations: int,
+    focal_point=[0, 0, 0],
 ):
     images_dir = os.path.join(output_dir, "images")
     output_json = os.path.join(output_dir, "cameras.json")
     os.makedirs(images_dir, exist_ok=True)
 
     # setup plotter
-    pl = pv.Plotter(off_screen=True)
+    w, h = int(2 * cx), int(2 * cy)
+    pl = pv.Plotter(off_screen=True, window_size=[w, h])
     pl.import_gltf(gltf_path)
 
-    # generate intrinsics and camera positions
-    intrinsics = generate_camera_intrinsics(fx, fy, cx, cy)
-    camera_positions = generate_spiral_camera_positions(
-        num_views, radius, height, rotations
-    )
+    # intrinsics
+    intrinsics = generate_camera_intrinsics(f, cx, cy)
+    view_angle = 180 / math.pi * (2.0 * math.atan2(h/2.0, f))
+    pl.camera.SetWindowCenter(0, 0)
+    pl.camera.SetViewAngle(view_angle)
 
     # render
-    camera_data = render_images(
-        pl, camera_positions, intrinsics, images_dir, focal_point=[0, -0.3, 0]
+    camera_positions = generate_spiral_camera_positions(
+        num_views, radius, rotations
     )
-    save_camera_data(camera_data, output_json)
+    camera_data = render_images(
+        pl, camera_positions, intrinsics, images_dir, focal_point
+    )
+    with open(output_json, "w") as file:
+        json.dump(camera_data, file, indent=4)
 
 
 if __name__ == "__main__":
@@ -145,10 +149,9 @@ if __name__ == "__main__":
         required=True,
         help="Output directory for images, e.g. scene/{scene_name}",
     )
-    parser.add_argument("--fx", type=float, default=800, help="Focal length x")
-    parser.add_argument("--fy", type=float, default=800, help="Focal length y")
-    parser.add_argument("--cx", type=float, default=640, help="Principal point x")
-    parser.add_argument("--cy", type=float, default=480, help="Principal point y")
+    parser.add_argument("--f", type=float, default=1600, help="Focal length")
+    parser.add_argument("--cx", type=float, default=1200, help="Principal point x")
+    parser.add_argument("--cy", type=float, default=960, help="Principal point y")
     parser.add_argument(
         "-n",
         "--num_views", type=int, default=100, help="Number of views to generate"
@@ -156,9 +159,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--radius", type=float, default=1.5, help="Radius of the spiral"
     )
-    parser.add_argument("--height", type=float, default=3, help="Height of the spiral")
     parser.add_argument(
         "--rotations", type=int, default=5, help="Number of rotations in the spiral"
+    )
+    parser.add_argument(
+        "--focal_point",
+        type=float,
+        nargs=3,
+        default=[0, 0, 0],
+        help="Focal point for the camera",
     )
 
     args = parser.parse_args()
@@ -166,12 +175,11 @@ if __name__ == "__main__":
     generate_model_views(
         args.input_path,
         args.output_path,
-        args.fx,
-        args.fy,
+        args.f,
         args.cx,
         args.cy,
         args.num_views,
         args.radius,
-        args.height,
         args.rotations,
+        args.focal_point,
     )
