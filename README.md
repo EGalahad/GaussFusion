@@ -3,7 +3,7 @@
 
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
 
-<div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
+<!-- <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
     <div style="flex: 1; max-width: 45%; text-align: center;">
         <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" style="width: 100%; height: auto;"/>
         <div>Figure 1a: Bonsai on Desktop</div>
@@ -13,9 +13,23 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
         <div>Figure 1b: Lamborghini in Garage</div>
     </div>
 </div>
-<p style="text-align: center;">Our plug-and-play merging visualizer supporting versatile object integration across different scenes.</p>
+<p style="text-align: center;">Our plug-and-play merging visualizer supporting versatile object integration across different scenes.</p> -->
+<p align="center">
+  <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" width="45%" />
+  <img src="assets/lamborghini_in_garage.png" alt="lamborghini in garage" width="45%" />
+</p>
 
-<div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
+<p align="center">
+  <em>Figure 1a: Bonsai on Desktop &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 1b: Lamborghini in Garage</em>
+</p>
+
+<p align="center">
+  Our plug-and-play merging visualizer supporting versatile object integration across different scenes.
+</p>
+
+
+
+<!-- <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
     <div style="flex: 1; max-width: 45%; text-align: center;">
         <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" style="width: 100%; height: auto;"/>
         <div>Figure 2a: 384p @ 60 FPS</div>
@@ -29,7 +43,23 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
         <div>Figure 2c: 3072p @ 8 FPS</div>
     </div>
 </div>
-<p style="text-align: center;">Multi-resolution rendering enables trade-off between visual quality and performance.</p>
+<p style="text-align: center;">Multi-resolution rendering enables trade-off between visual quality and performance.</p> -->
+
+<p align="center">
+  <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" width="30%" />
+  <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" width="30%" />
+  <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" width="30%" />
+</p>
+
+<p align="center">
+  <em>Figure 2a: 384p @ 60 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2b: 1024p @ 35 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2c: 3072p @ 8 FPS</em>
+</p>
+
+<p align="center">
+  Multi-resolution rendering enables trade-off between visual quality and performance.
+</p>
+
+
 
 ## Data Collection
 
