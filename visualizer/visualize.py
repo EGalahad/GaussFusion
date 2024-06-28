@@ -216,10 +216,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--back_ground", type=str, required=True, help="Path to the background PLY file"
+        "--background", type=str, required=True, help="Path to the background PLY file"
     )
     parser.add_argument(
-        "--object", type=str, required=True, help="Path to the object PLY file"
+        "--object", type=str, help="Path to the object PLY file"
     )
     parser.add_argument(
         "--offset",
@@ -237,8 +237,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    gm = HybridGaussianModel(3)
-    gm.load_ply(args.back_ground, args.object)
+    if args.object is not None:
+        gm = HybridGaussianModel(3)
+        gm.load_ply(args.background, args.object)
+    else:
+        gm = GaussianModel(3)
+        gm.load_ply(args.background)
 
     gui = ViserViewer(
         device="cuda",

@@ -366,7 +366,7 @@ class HybridGaussianModel(GaussianModel):
 
         self.bg_len = 0
 
-    def load_ply(self, path_bg, path_obj, rot_bg=None, clip_radius=0.5):
+    def load_ply(self, path_bg, path_obj):
         super().load_ply(path_bg)
         self._xyz_bg = self._xyz
         self._features_dc_bg = self._features_dc
@@ -374,12 +374,41 @@ class HybridGaussianModel(GaussianModel):
         self._scaling_bg = self._scaling
         self._rotation_bg = self._rotation
         self._opacity_bg = self._opacity
-        self.bg_len = len(self._xyz)
-        if rot_bg is not None:
-            # rotate the points and gaussians of background
-            self._xyz_bg = torch.matmul(self._xyz_bg, rot_bg)
-            self._features_dc_bg = torch.matmul(self._features_dc_bg, rot_bg)
-            self._features_rest_bg = torch.matmul(self._features_rest_bg, rot_bg)
+
+        # # for desktop scene
+        # mask = torch.logical_and(self._xyz_bg[:, 2] < 2, self._xyz_bg[:, 2] > -6)
+        # air_mask_z = torch.logical_and(self._xyz_bg[:, 2] < 1.5, self._xyz_bg[:, 2] > -5)
+        # air_mask_x = self._xyz_bg[:, 0] < 2
+        # air_mask_y = torch.logical_and(self._xyz_bg[:, 1] < 7, self._xyz_bg[:, 1] > -5)
+        # air_mask = torch.logical_and(air_mask_z, air_mask_x)
+        # air_mask = torch.logical_and(air_mask, air_mask_y)
+        # mask = torch.logical_and(mask, ~air_mask)
+        
+        # # for garage scene
+        # air_mask_z = torch.logical_and(self._xyz_bg[:, 2] < 2, self._xyz_bg[:, 2] > -2.5)
+        # air_mask_y = torch.logical_and(self._xyz_bg[:, 1] < 1, self._xyz_bg[:, 1] > -2.5)
+        # air_mask_x = torch.logical_and(self._xyz_bg[:, 0] < 5, self._xyz_bg[:, 0] > -2)
+        # air_mask = torch.logical_and(air_mask_z, air_mask_y)
+        # air_mask = torch.logical_and(air_mask, air_mask_x)
+        # mask = ~air_mask
+        # air_mask_y = torch.logical_and(self._xyz_bg[:, 1] < 5, self._xyz_bg[:, 1] > -5)
+        # air_mask_x = self._xyz_bg[:, 0] < -2
+        # air_mask = torch.logical_and(air_mask_z, air_mask_y)
+        # air_mask = torch.logical_and(air_mask, air_mask_x)
+        # mask = torch.logical_and(mask, ~air_mask)
+        
+
+        # self._xyz_bg = self._xyz_bg[mask]
+        # self._features_dc_bg = self._features_dc_bg[mask]
+        # self._features_rest_bg = self._features_rest_bg[mask]
+        # self._scaling_bg = self._scaling_bg[mask]
+        # self._rotation_bg = self._rotation_bg[mask]
+        # self._opacity_bg = self._opacity_bg[mask]
+        # print(
+        #     f"background points before prune: {len(mask)}, background points after prune: {mask.sum().item()}"
+        # )
+        # self.bg_len = len(self._xyz_bg)
+
 
         super().load_ply(path_obj)
         self._xyz_obj = self._xyz
@@ -389,19 +418,23 @@ class HybridGaussianModel(GaussianModel):
         self._rotation_obj = self._rotation
         self._opacity_obj = self._opacity
 
-        # clip the points of object with a radius
-        offset = torch.tensor([0.0, 0.0, 0.4], dtype=torch.float, device="cuda")
-        dist = torch.norm(self._xyz_obj - offset, dim=1)
-        mask = dist < clip_radius
-        self._xyz_obj = self._xyz_obj[mask]
-        self._features_dc_obj = self._features_dc_obj[mask]
-        self._features_rest_obj = self._features_rest_obj[mask]
-        self._scaling_obj = self._scaling_obj[mask]
-        self._rotation_obj = self._rotation_obj[mask]
-        self._opacity_obj = self._opacity_obj[mask]
-        print(
-            f"original object points: {len(dist)}, clipped object points: {len(self._xyz_obj)}"
-        )
+        # # for lamborghini
+        # mask = torch.linalg.norm(self._xyz_obj[:, :2], dim=1) < 3.5
+        # mask = torch.logical_and(mask, self._xyz_obj[:, 0] > -1.7)
+        # mask = torch.logical_and(mask, self._xyz_obj[:, 0] < 1.7)
+        # mask = torch.logical_and(mask, self._xyz_obj[:, 1] > -4)
+        # mask = torch.logical_and(mask, self._xyz_obj[:, 1] < 4)
+
+        # self._xyz_obj = self._xyz_obj[mask]
+        # self._features_dc_obj = self._features_dc_obj[mask]
+        # self._features_rest_obj = self._features_rest_obj[mask]
+        # self._scaling_obj = self._scaling_obj[mask]
+        # self._rotation_obj = self._rotation_obj[mask]
+        # self._opacity_obj = self._opacity_obj[mask]
+        # print(
+        #     f"object points before prune: {len(mask)}, object points after prune: {mask.sum().item()}"
+        # )
+
 
         # concatenate background and object points
         self._xyz = torch.cat((self._xyz_bg, self._xyz_obj), dim=0)
@@ -435,8 +468,6 @@ class HybridGaussianModel(GaussianModel):
 
 
 if __name__ == "__main__":
-    # gm = GaussianModel(3)
-    # gm.load_ply("/home/elijah/Documents/cv_project/weng-wong-project-cv/object.ply")
     gm = HybridGaussianModel(3)
     gm.load_ply(
         "/home/elijah/Documents/cv_project/weng-wong-project-cv/train.ply",
