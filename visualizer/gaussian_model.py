@@ -407,7 +407,7 @@ class HybridGaussianModel(GaussianModel):
         # print(
         #     f"background points before prune: {len(mask)}, background points after prune: {mask.sum().item()}"
         # )
-        # self.bg_len = len(self._xyz_bg)
+        self.bg_len = len(self._xyz_bg)
 
 
         super().load_ply(path_obj)
