@@ -59,7 +59,15 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
   Multi-resolution rendering enables trade-off between visual quality and performance.
 </p>
 
-
+## Table of Contents
+- [Data Collection](#data-collection)
+  - [3D Models](#3d-models)
+  - [Video Scans](#video-scans)
+- [Data Preprocessing](#data-preprocessing)
+  - [Image Generation](#image-generation)
+  - [COLMAP Feature Matching and Reconstruction](#colmap-feature-matching-and-reconstruction)
+- [Gaussian Splatting Training](#gaussian-splatting-training)
+- [Visualization](#visualization)
 
 ## Data Collection
 
