@@ -213,7 +213,7 @@ Now the sparse model will be created under the `sparse_transformed/0,1,2,...` di
 
 ## Gaussian Splatting Training
 
-For training the Gaussian Splatting model, please refer to [Grendal-GS](https://github.com/nyu-systems/Grendal-GS).
+For training the Gaussian Splatting model, please refer to [Grendel-GS](https://github.com/nyu-systems/Grendel-GS).
 
 Since the distributed system saves one `.ply` file for each GPU, you can use the following script to merge them in to a single `.ply` file:
 
