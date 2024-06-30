@@ -3,9 +3,11 @@
 
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
 
+For faster training, use the [Grendel-GS](https://github.com/nyu-systems/Grendel-GS) distributed Gaussian Splatting training repository.
+
 ## 🌟 Visualizer Features
 
-1. 🔮 **Multi-Model Integration**: Supports trained Gaussian Splatting models in `ply` format, compatible with various 3DGS training repositories.
+1. 🔮 **Format Compatibility**: Supports trained Gaussian Splatting models in `ply` format, compatible with various 3DGS training repositories. Instead of custom checkpoint files expected by some visualizer.
 
 2. 🎨 **Multi-Model Support**: Visualize one or two Gaussian Splatting models simultaneously.
 
