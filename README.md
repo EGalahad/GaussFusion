@@ -3,6 +3,17 @@
 
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
 
+## 🌟 Visualizer Features
+
+1. 🔮 **Multi-Model Integration**: Supports trained Gaussian Splatting models in `ply` format, compatible with various 3DGS training repositories.
+
+2. 🎨 **Multi-Model Support**: Visualize one or two Gaussian Splatting models simultaneously.
+
+3. 🕹️ **Interactive Object Manipulation**: Easily adjust position, scale, and orientation of objects in real-time for perfect scene composition.
+
+4. 🖥️ **Adaptive Rendering**: Toggle between different resolutions on-the-fly, balancing visual quality and performance to suit your hardware capabilities.
+
+
 <!-- <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
     <div style="flex: 1; max-width: 45%; text-align: center;">
         <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" style="width: 100%; height: auto;"/>
@@ -24,7 +35,7 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
 </p>
 
 <p align="center">
-  Our plug-and-play merging visualizer supporting versatile object integration across different scenes.
+  Our plug-and-play merging visualizer supports versatile object integration across different scenes.
 </p>
 
 
@@ -60,14 +71,17 @@ This project provides a streamlined pipeline to create a Gaussian Splatting mode
 </p>
 
 ## Table of Contents
-- [Data Collection](#data-collection)
-  - [3D Models](#3d-models)
-  - [Video Scans](#video-scans)
-- [Data Preprocessing](#data-preprocessing)
-  - [Image Generation](#image-generation)
-  - [COLMAP Feature Matching and Reconstruction](#colmap-feature-matching-and-reconstruction)
-- [Gaussian Splatting Training](#gaussian-splatting-training)
-- [Visualization](#visualization)
+- [GaussFusion: Seamless 3D Object Integration using Gaussian Splatting](#gaussfusion-seamless-3d-object-integration-using-gaussian-splatting)
+  - [🌟 Visualizer Features](#-visualizer-features)
+  - [Table of Contents](#table-of-contents)
+  - [Data Collection](#data-collection)
+    - [3D Models](#3d-models)
+    - [Video Scans](#video-scans)
+  - [Data Preprocessing](#data-preprocessing)
+    - [Image Generation](#image-generation)
+    - [COLMAP Feature Matching and Reconstruction](#colmap-feature-matching-and-reconstruction)
+  - [Gaussian Splatting Training](#gaussian-splatting-training)
+  - [Visualization](#visualization)
 
 ## Data Collection
 
@@ -238,5 +252,8 @@ python visualizer/visualize.py \
 Open your browser and navigate to `http://localhost:8080` to view the visualization.
 
 <div style="text-align:center">
-  <img src="assets/visualizer_demo.png" alt="visualizer demo" width="90%" />
+  <img src="assets/bonsai_30k_vs_50k.png" alt="visualizer demo" width="48%" />
+  <img src="assets/lamborghini_30k_vs_50k.png" alt="visualizer demo" width="48%" />
+  <img src="assets/bonsai_3dgs.png" alt="visualizer demo" width="48%" />
+  <img src="assets/visualizer_demo.png" alt="visualizer demo" width="48%" />
 </div>
