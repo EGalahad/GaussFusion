@@ -1,6 +1,18 @@
 # GaussFusion: Seamless 3D Object Integration using Gaussian Splatting
 **Computer Vision Final Project on 3D Gaussian Splatting**
 
+<p align="center">
+    <!-- stars badge -->
+    <a href="https://github.com/EGalahad/GaussFusion/stargazers">
+        <img alt="GitHub stars" src="https://img.shields.io/github/stars/EGalahad/GaussFusion?style=social"/>
+    </a>
+    <!-- pull requests badge -->
+    <a href="https://github.com/EGalahad/GaussFusion/pulls">
+        <img alt="Pull Requests" src="https://img.shields.io/github/issues-pr/EGalahad/GaussFusion"/>
+    </a>
+
+</p>
+
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
 
 For faster training, use the [Grendel-GS](https://github.com/nyu-systems/Grendel-GS) distributed Gaussian Splatting training repository.
