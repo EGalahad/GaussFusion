@@ -10,7 +10,33 @@
     <a href="https://github.com/EGalahad/GaussFusion/pulls">
         <img alt="Pull Requests" src="https://img.shields.io/github/issues-pr/EGalahad/GaussFusion"/>
     </a>
+</p>
 
+<p align="center">
+  <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" width="45%" />
+  <img src="assets/lamborghini_in_garage.png" alt="lamborghini in garage" width="45%" />
+</p>
+
+<p align="center">
+  <em>Figure 1a: Bonsai on Desktop &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 1b: Lamborghini in Garage</em>
+</p>
+
+<p align="center">
+  Our plug-and-play merging visualizer supports versatile object integration across different scenes.
+</p>
+
+<p align="center">
+  <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" width="32%" />
+  <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" width="32%" />
+    <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" width="32%" />
+</p>
+
+<p align="center">
+  <em>Figure 2a: 384p @ 60 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2b: 1024p @ 35 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2c: 3072p @ 8 FPS</em>
+</p>
+
+<p align="center">
+  Multi-resolution rendering enables trade-off between visual quality and performance.
 </p>
 
 This project provides a streamlined pipeline to create a Gaussian Splatting model from two types of data sources: a 3D model of an object (downloaded from the internet) and a video scan of your environment. Our toolkit **facilitates easy preprocessing** of data into a format compatible with the Gaussian Splatting algorithm. Additionally, we offer **an intuitive and interactive visualizer** to merge and view the object in a new background, allowing for easy navigation and control over the object's relative position and scale.
@@ -26,63 +52,6 @@ For faster training, use the [Grendel-GS](https://github.com/nyu-systems/Grendel
 3. 🕹️ **Interactive Object Manipulation**: Easily adjust position, scale, and orientation of objects in real-time for perfect scene composition.
 
 4. 🖥️ **Adaptive Rendering**: Toggle between different resolutions on-the-fly, balancing visual quality and performance to suit your hardware capabilities.
-
-
-<!-- <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
-    <div style="flex: 1; max-width: 45%; text-align: center;">
-        <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" style="width: 100%; height: auto;"/>
-        <div>Figure 1a: Bonsai on Desktop</div>
-    </div>
-    <div style="flex: 1; max-width: 45%; text-align: center;">
-        <img src="assets/lamborghini_in_garage.png" alt="lamborghini in garage" style="width: 100%; height: auto;"/>
-        <div>Figure 1b: Lamborghini in Garage</div>
-    </div>
-</div>
-<p style="text-align: center;">Our plug-and-play merging visualizer supporting versatile object integration across different scenes.</p> -->
-<p align="center">
-  <img src="assets/bonsai_on_desktop.png" alt="bonsai on desktop" width="45%" />
-  <img src="assets/lamborghini_in_garage.png" alt="lamborghini in garage" width="45%" />
-</p>
-
-<p align="center">
-  <em>Figure 1a: Bonsai on Desktop &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 1b: Lamborghini in Garage</em>
-</p>
-
-<p align="center">
-  Our plug-and-play merging visualizer supports versatile object integration across different scenes.
-</p>
-
-
-
-<!-- <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; max-width: 100%;">
-    <div style="flex: 1; max-width: 45%; text-align: center;">
-        <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" style="width: 100%; height: auto;"/>
-        <div>Figure 2a: 384p @ 60 FPS</div>
-    </div>
-    <div style="flex: 1; max-width: 45%; text-align: center;">
-        <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" style="width: 100%; height: auto;"/>
-        <div>Figure 2b: 1024p @ 35 FPS</div>
-    </div>
-    <div style="flex: 1; max-width: 45%; text-align: center;">
-        <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" style="width: 100%; height: auto;"/>
-        <div>Figure 2c: 3072p @ 8 FPS</div>
-    </div>
-</div>
-<p style="text-align: center;">Multi-resolution rendering enables trade-off between visual quality and performance.</p> -->
-
-<p align="center">
-  <img src="assets/multi_res_384_fps_60.png" alt="multi_res_384_fps_60" width="32%" />
-  <img src="assets/multi_res_1024_fps_35.png" alt="multi_res_1024_fps_35" width="32%" />
-    <img src="assets/multi_res_3072_fps_8.png" alt="multi_res_3072_fps_8" width="32%" />
-</p>
-
-<p align="center">
-  <em>Figure 2a: 384p @ 60 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2b: 1024p @ 35 FPS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Figure 2c: 3072p @ 8 FPS</em>
-</p>
-
-<p align="center">
-  Multi-resolution rendering enables trade-off between visual quality and performance.
-</p>
 
 ## Table of Contents
 - [GaussFusion: Seamless 3D Object Integration using Gaussian Splatting](#gaussfusion-seamless-3d-object-integration-using-gaussian-splatting)
